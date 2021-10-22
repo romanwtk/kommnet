@@ -1,0 +1,170 @@
+\documentclass[11pt,a4paper]{scrartcl}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{makeidx}
+\usepackage{hyperref}
+\usepackage{colortbl}
+\usepackage{listings}
+\usepackage{chngcntr}
+\usepackage{upgreek}
+\usepackage{pgfplots}
+\pgfplotsset{compat = newest}
+\usepackage{amsthm}
+\usepackage{ulem}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usetikzlibrary{positioning}
+\usepackage{tikz-network}
+\usepackage[left=3cm,right=3cm,top=3cm,bottom=3cm]{geometry}
+
+\usepackage[backend=biber, style=alphabetic]{biblatex}
+\addbibresource{literature.bib}
+\author{Roman Wetenkamp}
+\title{Kommunikations- \& Netztechnik}
+\subtitle{Verbinden -- Verknüpfen -- Verteilen}
+
+\newtheorem{note}{Bemerkung}
+\newtheorem{definition}{Definition}
+\newtheorem{satz}{Satz}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{example}{Beispiel}
+
+
+\begin{document}
+\vspace{3cm}
+\maketitle
+\begin{center}
+\includegraphics[scale=0.7]{DHBW.jpg}
+\end{center}
+\pagebreak
+\tableofcontents
+\pagebreak
+\section*{Vorwort}
+In guter Tradition zum letzten Semester wage ich mich auch jetzt wieder an ein Skript für ein Modul, für das ich es als sinnvoll erachte -- Kommunikations- und Netztechnik. Hier beschäftigen wir uns mit den Grundlagen des Internets, finden heraus, durch welche Protokolle und auf welchen Ebenen Daten übertragen werden und wie wir Unternehmen und Organisationen mit einem sicheren Netzwerk ausstatten. Dieses Skript greift die Inhalte der Vorlesung auf, fasst sie zusammen und ergänzt sie dort, wo es sinnvoll ist, durch Erklärungen und Übungen. Idealerweise sind wir beide dann gut auf die Klausur vorbereitet.
+\textit{Viel Erfolg!}  \\
+\begin{flushright}
+Roman Wetenkamp \\
+Mannheim, den \today
+\end{flushright}  
+\vfill
+\paragraph{Warnung}
+Das Studium an einer Dualen Hochschule unterscheidet sich von dem Studium an Universitäten oder regulären Fachhochschulen insbesondere dadurch, dass aufgrund der Dualität von Theorie und Praxis meist nur die Hälfte der Zeit zur Vermittlung des Stoffes zur Verfügung steht (wenn dann auch intensiver). Daher gehen Sie bitte nicht davon aus, dass Sie dieses Skript ausreichend auf Klausuren in regulären Vollzeitstudiengängen vorbereitet!
+\paragraph{Hinweis}
+Dieses Dokument ist kein Vorlesungsmaterial, hat nicht den Anspruch auf {Voll}\-{ständigkeit} und enthält mit Sicherheit Fehler. Desweiteren ist es noch lange nicht vollendet (es ist infrage zustellen, ob es das je sein wird), und doch möchte ich Sie ermutigen, beizutragen! Jegliche Fehler, Probleme oder Anmerkungen können Sie mir gerne über das dazugehörige GitHub-Repository unter der URL \url{https://github.com/RWetenkamp/kommnet} zukommen lassen. Danke!
+\pagebreak
+\section{Einführung}
+Das Internet ist für uns alle Neuland -- Klar, was auch sonst, dieses unförmige, kaum verständliche Ding, das uns ermöglicht, uns über Länder- und Kontinentalgrenzen zu vernetzen und Informationen von überall auf der Welt zu beziehen, muss Neuland sein. Sicherlich auch für alle und nicht nur für eine konservative, leicht hinterherhinkende Regierungspartei. Doch genug der politischen Spitzen, besinnen wir uns lieber darauf, was es wirklich ist: Längst ist das Internet fundamentaler und integraler Bestandteil unseres Alltags. Gerade durch die Corona-Pandemie zeigte es sich auf so eindrucksvolle Weise: Online-Konzerte, Online-Unterricht, Online-Konferenzen. Längst wurde es für quasi alle Teile der Bevölkerung unabdingbar, sich einen Zugang zum Internet zu einzurichten und teilzunehmen. \\
+Für Anwender*innen reicht es dabei völlig aus, einen Webbrowser oder internetfähige Applikationen bedienen zu können -- zumindest bis irgendetwas nicht funktioniert. {\glqq}Oh je, ich habe das Internet gelöscht!{\grqq} und {\glqq}Mein WLAN funktioniert nicht mehr!{\grqq}, vielleicht kennen Sie diese oder ähnliche sonderbare Aussprüche aus Ihrem Familien- oder Bekanntenkreis. \\
+Mit diesem Modul und Skript wollen wir einen Blick hinter die Kulissen wagen und verstehen, wo die Unterschiede zwischen 404, 500 und 201 liegen, wann UDP TCP vorzuziehen ist und warum es sich wirklich nicht lohnt, in einem Elektronikmarkt nach einem WLAN-Kabel zu fragen. Doch beginnen wir mit den grundlegenden Begriffen und Definitionen.
+\part{Grundlegendes}
+\section{Netzwerk}
+\begin{definition}
+Ein Netzwerk besteht aus mindestens zwei \textbf{Endgeräten} mit Netzwerkdiensten, einem \textbf{Übertragungsmedium} und \textbf{Netzwerkprotokollen}.
+\end{definition}
+Das Übertragungsmedium kann dabei leitungsgebunden (z.B. Kupferkabel oder Glasfaser) oder nicht-leitungsgebunden (z.B. durch Funkwellen) sein. Die Art und Weise, wie die Endgeräte über dieses Medium kommunizieren, ist in Netzwerkprotokollen festgelegt - fast wie überregulierte Dating-Konventionen: Wer geht den ersten Schritt? Wie muss ich dich nach einem Treffen fragen? Und muss ich jedes Mal nachhaken, ob du noch an mir interessiert bist oder sind wir das solange, bis du widersprichst? 
+\begin{definition}
+Protokolle definieren das Format und die Reihenfolge, in der Nachrichten von Systemen im Netzwerk gesendet und empfangen werden sowie die Aktionen, die durch die Nachrichten ausgelöst werden.
+\end{definition}
+Für verschiedenste Anwendungsfälle kommen unterschiedliche Protokolle zum Einsatz -- manche mit dem Ziel, möglichst schnell viele Informationen zu übertragen, manche mit dem Ziel, verlustfrei ganz sicher zu gehen und nichts zu riskieren. Wir werden die verschiedenen Protokolle später in aller Ausführlichkeit thematisieren.
+\begin{definition}
+Das Internet ist ein hierarchisch aufgebautes Netzwerk von Netzwerken.
+\end{definition}
+Des Weiteren lassen sich die Begriffe Internet und Intranet unterscheiden:
+\begin{itemize}
+\item \textbf{Intranet} bezeichnet ein von außen nicht zugängliches, abgeschlossenes Netzwerk eines Unternehmens oder einer Institution (Zugang z.B. über VPN)
+\item \textbf{Internet} bezeichnet das öffentlich zugängliche, von überall aus erreichbare Netzwerk von Netzwerken.
+\end{itemize}
+\begin{definition}
+Ein Dienst bezeichnet eine Kommunikationsinfrastruktur, die verteilte Anwendungen ermöglicht.
+\end{definition}
+Beispiele für Dienste sind E-Mail, Voice-over-IP oder Streaming. Diese Dienste kommunizieren dabei meistens über TCP oder UDP.
+\subsection{Kommunikationsmodelle}
+\begin{enumerate}
+\item \textbf{Client-Server-Modell} \\
+Im Client-Server-Modell ist genau festgelegt, welches Gerät anfragend und welches antwortend ist. Der \textbf{Client} ist hierbei das Endgerät, z.B. ein Laptop, ein Smartphone oder ein Desktop-Rechner, von dem eine Anfrage nach einer bestimmten Ressource abgeschickt wird. Der \textbf{Server} ist ein dauerhaft betriebener Rechner, der von sich aus keine Anfragen an Clients absendet, sondern lediglich die Anfragen der Clients beantwortet und die angefragten Ressourcen zurücksendet. Ein Beispiel für dieses Modell ist die Kommunikation per E-Mail.
+\item \textbf{Peer-to-Peer-Kommunikation} \\
+In diesem Modell kommunizieren zwei typidentische Endgeräte miteinander. Beide Geräte können Anfragen stellen und ebenso auch angefragte Daten / Ressourcen zurücksenden. Hierbei werden (fast) keine zentralen Server eingesetzt, die Kommunikation zwischen den Geräten erfolgt weitgehend autonom. Ein Beispiel für dieses Modell liefert die Internettelefonie per Skype.
+\end{enumerate}
+\subsection{Zuverlässigkeit}
+Protokolle besitzen verschiedene Eigenschaften. Je nach beabsichtigtem Einsatzzweck entscheiden diese Eigenschaften, welches Protokoll verwendet wird. Eine wesentliche Eigenschaft ist die \textbf{Übertragungszuverlässigkeit}.
+\paragraph{TCP-Dienste} Bei TCP wird eine zuverlässige Datenübertragung gewährleistet, die auch die Reihenfolge von Paketen erhält. Sollte ein Paket verloren werden, wird die entsprechende Übertragung wiederholt. Dafür ist ein vorgeschaltetes Handshaking nötig. TCP enthält außerdem eine Fluss- und Überlastkontrolle, um den Netzverkehr steuern zu können. TCP wird in vielen Fällen eingesetzt, wo die Zuverlässigkeit der Übertragung einen höheren Stellenwert als die Geschwindigkeit (also die Bandbreite) hat. \parencite{RFC793}
+\paragraph{UDP-Dienste} Das Protokoll UDP ist hingegen verbindungslos, folglich findet auch kein Handshaking statt. Der Datenverkehr mittels UDP verläuft unzuverlässiger. Ebenso ist keine Fluss- oder Überlastkontrolle enthalten. UDP wird insbesondere dann eingesetzt, wenn die Übertragungszeit wichtiger ist als die Vollständigkeit und Verlustfreiheit, beispielsweise bei (Video-)telefonie- oder Gaming-Anwendungen. Dieses Prinzip bezeichnen wir auch als \textbf{best effort}-Konzept. \parencite{RFC768}
+\subsection{Vermittlungskonzepte}
+Neben verschiedenen Protokollen muss auch ein Vermittlungskonzept gewählt werden, dass insbesondere dann zum Einsatz kommt, wenn mehrere Clients gleichzeitig einen Übermittlungskanal nutzen (könnten). Wir unterscheiden hierbei zwei wesentliche Konzepte:
+\begin{itemize}
+\item \textbf{Leitungsbasierte Vermittlung}: Für jede Verbindung ist eine eigene Leitung erforderlich, also können nicht mehrere Endgeräte gleichzeitig über eine Leitung kommunizieren. Dies ist beispielsweise im Telefonnetz der Fall: Dass ein Endgerät gleichzeitig mit mehreren anderen Endgeräten kommuniziert ist hier weder erwünscht noch möglich. \\
+Grundlage für die Kommunikation ist das Reservieren der Ressourcen von Ende-zu-Ende. Diese Ressourcen sind fest dieser Verbindung zugeordnet und stehen somit nur für diese zur Verfügung. Dadurch wird die Dienstgüte (Quality of Service) garantiert.
+\item \textbf{Paketbasierte Vermittlung}: Im Gegensatz dazu wird in diesem Ansatz die Kommunikation in Datenpakete eingeteilt, die einzeln übertragen werden. So können sich mehrere Verbindungen eine Leitung teilen, da jedes Paket Informationen enthält, um es später zuordnen zu können. Bei diesem Ansatz kann die volle Bandbreite ausgenutzt werden.
+\end{itemize}
+\subsubsection{Multiplexing}
+Für die paketbasierte Vermittlung ist das Konzept Multiplexing entscheidend. Hier werden Netzwerkressourcen in Einheiten aufgeteilt und diese jeweils den Verbindungen zugeteilt. Dafür gibt es zwei unterschiedliche Ansätze:
+\begin{itemize}
+\item \textbf{Frequency Division Multiplex (FDM)}
+Bei diesem Ansatz wird die zur Verfügung stehende Frequenz aufgeteilt, sodass Pakete zwar parallel und gleichförmig übertragen werden können, jedoch nur mit einem Bruchteil der zur Verfügung stehenden Bandbreite.
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[node distance=5mm]
+\node (rect) (a) [draw,minimum width=3cm,minimum height=0.3cm] {};
+\node (rect) (b) [draw,minimum width=3cm,minimum height=0.3cm, below of=a] {};
+\node (rect) (c) [draw,minimum width=3cm,minimum height=0.3cm, below of=b] {};
+\node (rect) (d) [draw,minimum width=3cm,minimum height=0.3cm, below of=c] {};
+\draw[->,ultra thick] (-1.5,-1.7)--(3,-1.7) node[right]{$x$};
+\draw[->,ultra thick] (-1.5,-1.7)--(-1.5,1) node[above]{$y$};
+\end{tikzpicture}
+\caption{Frequency Division Multiplex}
+\end{figure}
+\item \textbf{Time Division Multiplex (TDM)}
+Alternativ dazu kann auch die Zeit geteilt werden: Pakete erhalten nun die volle Bandbreite, können jedoch nicht kontinuierlich unterbrechungsfrei aneinandergereiht versendet werden, sondern werden mit Paketen anderer Verbindungen in einer Reihenfolge abwechselnd übertragen.
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[node distance=5mm]
+\node (rect) (a) at (-1.3, -0.6) [draw,minimum width=0.3cm,minimum height=2cm] {};
+\node (rect) (b) [draw,minimum width=0.3cm,minimum height=2cm, right of=a] {};
+\node (rect) (c) [draw,minimum width=0.3cm,minimum height=2cm, right of=b] {};
+\node (rect) (d) [draw,minimum width=0.3cm,minimum height=2cm, right of=c] {};
+\node (rect) (e) [draw,minimum width=0.3cm,minimum height=2cm, right of=d] {};
+\node (rect) (f) [draw,minimum width=0.3cm,minimum height=2cm, right of=e] {};
+\node (rect) (g) [draw,minimum width=0.3cm,minimum height=2cm, right of=f] {};
+\draw[->,ultra thick] (-1.5,-1.7)--(3,-1.7) node[right]{$x$};
+\draw[->,ultra thick] (-1.5,-1.7)--(-1.5,1) node[above]{$y$};
+\end{tikzpicture}
+\caption{Time Division Multiplex}
+\end{figure}
+Das Verfahren der Paketvermittlung ist insbesondere für unregelmäßigen Datenverkehr geeigneter, da die Aufteilung der Ressourcen dort flexibler gehandhabt werden kann. Ein Router empfägt ein Paket komplett, bevor es in einer Warteschlange zwischengespeichert wird und bei Freigabe der Leitung weitergesendet wird. Beim \textbf{statistischen Multiplexing} gibt es kein festes Muster der Paketfolge.
+\end{itemize}
+Als \textbf{Teilstreckenverfahren} oder \textbf{Store and Forward} wird die Technik bezeichnet, bei der ein Paket von Knoten zu Knoten gesendet wird und an jedem Knoten erneut auf die Freigabe der nachfolgenden Teilstrecke warten muss. Ein Paket erhält folglich nicht die Freigabe, den gesamten Weg zurückzulegen, sondern wird in einzelnen Teilstrecken übertragen. Erst nachdem ein Paket vollständig übertragen wurde, wird es auf die nächste Leitung übertragen. Die Dauer einer Paketübertragung lässt sich berechnen:
+\[\frac{\text{Paketgröße in Bits}}{\text{Übertragungsrate in Bits pro Sekunde}} = \text{Zeitdauer in Sekunden}\]
+\subsection{Aufgaben}
+\paragraph{Aufgabe 1} Berechnen Sie die Übertragungsdauer bzw. Dateigröße jeweils.
+\begin{itemize}
+\item 256 Megabit auf einer 1 GBit/s-Leitung
+\item 32 Megabyte auf einer 16 MBit/s-Leitung
+\item 12 Sekunden Übertragungsdauer auf einer 250 MBit/s-Leitung
+\end{itemize}
+\paragraph{Aufgabe 2} Erläutern Sie die Unterschiede zwischen FDM und TDM.
+\paragraph{Aufgabe 3} Sie entwickeln eine Webanwendung für Online-Vorlesungen in Echtzeit. Wählen Sie ein geeignetes Protokoll und begründen Sie Ihre Wahl.
+\section{Terminologie}
+In diesem nun folgenden Teil widmen wir uns einigen, relevanten Begrifflichkeiten.
+\subsection{Datenübertragungsmodi}
+\paragraph{Parallele Datenübertragung} bezeichnet das Verfahren, bei dem die Übertragung der Bits auf mehreren Datenleitungen parallel erfolgt. Zusätzlich sind Steuerleitungen vorhanden. Dadurch kann ein hoher Datendurchsatz erreicht werden, wobei jedoch viele Leitungen nötig sind. Dieses Verfahren findet in internen und lokalen Bus-Systemen Anwendung.
+\paragraph{Serielle Datenübertragung} hingegen bezeichnet das Verfahren, bei dem die Daten auf einer Leitung nacheinander übertragen werden. Dieses Verfahren erreicht logischerweise einen geringeren Datendurchsatz, ist jedoch auch für größere Distanzen geeignet. Es findet Anwendung in internen Bus-Systemen und Computernetzwerken.
+\subsection{Kommunikationsmodi}
+\paragraph{simplex} bezeichnet eine Übertragung, die nur in eine Richtung stattfindet. Also beispielsweise Radio oder Fernsehen. Die Daten können empfangen werden, doch es können keine Daten zurückgesendet werden.
+\paragraph{half-duplex} hingegen ist die Möglichkeit, Daten in beide Richtungen zu übertragen, jedoch nicht gleichzeitig. Das ist beispielsweise bei Netzwerken mit Twisted-Pair-Verkabelung der Fall.
+\paragraph{duplex} ist nun die Königsklasse: Übertragung gleichzeitig in beide Richtungen, wie beispielsweise durch ein Glasfaserkabel.
+\subsection{Topologien} 
+Als Topologien bezeichnen wir Strukturen der Anordnung und Verkabelung von Kommunikationspartnern mit dem Ziel, die Ausfallsicherheit und auch die Verfügbarkeit eines Netzes zu maximieren. Häufig werden die klassischen Strukturen - insbesondere in größeren Netzen - vermischt. \\
+Wir unterscheiden die \textbf{physische} und die \textbf{logische Topologie}. Währen die physische Topologie den Aufbau der Verkabelung beschreibt, bestimmt die logische Topologie den Datenfluss zwischen den Endgeräten. 
+\subsubsection{Busnetz}
+In einem Bus-Netz sind alle Knoten über ein Medium verbunden. Fällt ein Knoten aus, führt das nicht zum Ausfall des gesamten Netzes. Allerdings kann in dieser Topologie immer nur ein Teilnehmer Daten senden. Die Kosten für ein Busnetz sind vergleichsweise gering, allerdings ist das Netz fehleranfällig und die Bandbreite wird auf alle Teilnehmer aufgeteilt. Wird der Bus an einem Punkt unterbrochen, führt das zum Ausfall des Netzes.
+\begin{figure}
+\centering
+\begin{tikzpicture}
+\Vertex{}
+\end{tikzpicture}
+\end{figure}
+\end{document}
