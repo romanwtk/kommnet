@@ -56,7 +56,7 @@ Das Studium an einer Dualen Hochschule unterscheidet sich von dem Studium an Uni
 \paragraph{Hinweis}
 Dieses Dokument ist kein Vorlesungsmaterial, hat nicht den Anspruch auf {Voll}\-{ständigkeit} und enthält mit Sicherheit Fehler. Desweiteren ist es noch lange nicht vollendet (es ist infrage zustellen, ob es das je sein wird), und doch möchte ich Sie ermutigen, beizutragen! Jegliche Fehler, Probleme oder Anmerkungen können Sie mir gerne über das dazugehörige GitHub-Repository unter der URL \url{https://github.com/RWetenkamp/kommnet} zukommen lassen. Danke!
 \pagebreak
-\section{Einführung}
+\section*{Einführung}
 Das Internet ist für uns alle Neuland -- Klar, was auch sonst, dieses unförmige, kaum verständliche Ding, das uns ermöglicht, uns über Länder- und Kontinentalgrenzen zu vernetzen und Informationen von überall auf der Welt zu beziehen, muss Neuland sein. Sicherlich auch für alle und nicht nur für eine konservative, leicht hinterherhinkende Regierungspartei. Doch genug der politischen Spitzen, besinnen wir uns lieber darauf, was es wirklich ist: Längst ist das Internet fundamentaler und integraler Bestandteil unseres Alltags. Gerade durch die Corona-Pandemie zeigte es sich auf so eindrucksvolle Weise: Online-Konzerte, Online-Unterricht, Online-Konferenzen. Längst wurde es für quasi alle Teile der Bevölkerung unabdingbar, sich einen Zugang zum Internet zu einzurichten und teilzunehmen. \\
 Für Anwender*innen reicht es dabei völlig aus, einen Webbrowser oder internetfähige Applikationen bedienen zu können -- zumindest bis irgendetwas nicht funktioniert. {\glqq}Oh je, ich habe das Internet gelöscht!{\grqq} und {\glqq}Mein WLAN funktioniert nicht mehr!{\grqq}, vielleicht kennen Sie diese oder ähnliche sonderbare Aussprüche aus Ihrem Familien- oder Bekanntenkreis. \\
 Mit diesem Modul und Skript wollen wir einen Blick hinter die Kulissen wagen und verstehen, wo die Unterschiede zwischen 404, 500 und 201 liegen, wann UDP TCP vorzuziehen ist und warum es sich wirklich nicht lohnt, in einem Elektronikmarkt nach einem WLAN-Kabel zu fragen. Doch beginnen wir mit den grundlegenden Begriffen und Definitionen.
@@ -161,10 +161,217 @@ Als Topologien bezeichnen wir Strukturen der Anordnung und Verkabelung von Kommu
 Wir unterscheiden die \textbf{physische} und die \textbf{logische Topologie}. Währen die physische Topologie den Aufbau der Verkabelung beschreibt, bestimmt die logische Topologie den Datenfluss zwischen den Endgeräten. 
 \subsubsection{Busnetz}
 In einem Bus-Netz sind alle Knoten über ein Medium verbunden. Fällt ein Knoten aus, führt das nicht zum Ausfall des gesamten Netzes. Allerdings kann in dieser Topologie immer nur ein Teilnehmer Daten senden. Die Kosten für ein Busnetz sind vergleichsweise gering, allerdings ist das Netz fehleranfällig und die Bandbreite wird auf alle Teilnehmer aufgeteilt. Wird der Bus an einem Punkt unterbrochen, führt das zum Ausfall des Netzes.
-\begin{figure}
+\begin{figure}[h]
 \centering
 \begin{tikzpicture}
-\Vertex{}
+\Vertex[y=3]{A}
+\Vertex[y=2]{B}
+\Vertex[y=1]{C}
+\Vertex[y=2.5,x=2]{D}
+\Vertex[y=1.5, x=2]{E}
+\Edge[path={A,{1,3},{1,2.5},D,{1,2.5},{1,2},B, {1,2}, {1,1.5}, E, {1,1.5}, {1, 1}}](A)(C)
 \end{tikzpicture}
+\caption{Busnetz-Topologie}
+\end{figure}
+\subsubsection{Ringnetz}
+In einem Ringnetz hingegen gibt es kein zentrales Medium, über den der Datenverkehr weitergeleitet wird. Stattdessen ist jeder Knoten mit seinen Nachbarn verbunden, sodass ein Ring entsteht. Der Datenverkehr passiert nun alle erforderlichen Endpunkte bei der Übertragung. Dadurch wird das Signal verstärkt und kann sich regenerieren, gleichzeitig ist diese Vorgehensweise sehr störanfällig. Ebenso wird die Bandbreite währenddessen geteilt. Das Ringnetz findet beispielsweise im Token-Ring-LAN Anwendung.
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}
+\Vertex[y=1, x=1]{A}
+\Vertex[y=0, x=0]{B}
+\Vertex[y=0, x=2]{D}
+\Vertex[y=-1, x=1]{C}
+\Edge[bend=45](B)(A)
+\Edge[bend=45](A)(D)
+\Edge[bend=45](D)(C)
+\Edge[bend=45](C)(B)
+\end{tikzpicture}
+\caption{Ringnetz-Topologie}
+\end{figure}
+\subsubsection{Sternnetz}
+Die dritte mögliche Topologie verläuft nun über eine zentrale Komponente, einen Switch. Jeder Knoten unterhält eine eigenständige Verbindung zur zentralen Komponente und diese ist nun dafür verantwortlich, die Datenpakete passend weiterzuleiten. Der Vorteil dieser Topologie liegt in der Übersichtlichkeit. Gleichzeitig besteht eine Abhängigkeit von der zentralen Komponente: Fällt diese aus, ist logischerweise kein Datenverkehr mehr möglich. Diese Topologie wird in Datennetzen häufig eingesetzt.
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}
+\Vertex[y=2, x=2]{B}
+\Vertex[y=0, x=0]{A}
+\Vertex[y=0, x=4]{C}
+\Vertex[y=-2, x=2]{D}
+\Vertex[label=Switch, size=1, RGB, color={127,201,127},y=0, x=2]{S}
+\Edge[](A)(S)
+\Edge[](B)(S)
+\Edge[](C)(S)
+\Edge[](D)(S)
+\end{tikzpicture}
+\caption{Sternnetz-Topologie}
+\end{figure}
+\subsubsection{Maschennetz}
+Um die Ausfallsicherheit zu erhöhen, bleibt als Ansatz noch die Vermaschung, entweder vollständig oder teilweise. Hierbei werden zusätzliche Redundanzen eingefügt und entweder jeder Knoten mit jedem übrigen verbunden oder zumindest die am stärksten frequentierten miteinander. Hierfür sind mehr Datenverbindungen erforderlich, jedoch führt der Ausfall eines Knotens nicht zum Totalausfall des gesamten Netzes, da alternative Wege gefunden werden können.
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}
+\Vertex[y=2, x=2]{B}
+\Vertex[y=0, x=0]{A}
+\Vertex[y=0, x=4]{C}
+\Vertex[y=-2, x=2]{D}
+\Edge[](A)(B)
+\Edge[](A)(C)
+\Edge[](B)(C)
+\Edge[](C)(D)
+\Edge[](A)(D)
+\Edge[](B)(D)
+\end{tikzpicture}
+\caption{Maschennetz-Topologie (teilvermascht)}
+\end{figure}
+\subsubsection{Baumnetze}
+Als nächste Topologieoption betrachten wir die Verknüpfung mehrerer Maschennetze zu sogenannten Baumnetzen. Der Gedanke hier ist, die Verbindung zwischen mehreren Netzen über Koppelglieder herzustellen, um Kosten zu sparen. Der Nachteil hierbei liegt in der Fehleranfälligkeit. Ebenso wird die Bandbreite geteilt und der Vorteil des Maschennetzes, über Redundanzen die Ausfallsicherheit zu gewährleisten, entfällt. Diese Topologie findet beispielsweise in Breitbandkabelnetzen Einsatz.
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}
+\Vertex[y=2, x=2]{B}
+\Vertex[y=0, x=0]{A}
+\Vertex[y=0, x=4]{C}
+\Vertex[y=-2, x=2]{D}
+\Edge[](A)(B)
+\Edge[](A)(C)
+\Edge[](B)(C)
+\Edge[](C)(D)
+\Edge[](A)(D)
+\Edge[](B)(D)
+\Vertex[y=2, x=8]{B2}
+\Vertex[y=0, x=6]{A2}
+\Vertex[y=0, x=10]{C2}
+\Vertex[y=-2, x=8]{D2}
+\Edge[](A2)(B2)
+\Edge[](A2)(C2)
+\Edge[](B2)(C2)
+\Edge[](C2)(D2)
+\Edge[](A2)(D2)
+\Edge[](B2)(D2)
+\Edge[](C)(C2)
+\end{tikzpicture}
+\caption{Baumnetz-Topologie}
+\end{figure}
+\subsubsection{Zellnetze}
+Während die vorangegangenen Topologien Leitungen als Verbindungsmedium nutzen, betrachten wir nun eine Topologie, die Funkwellen nutzt. Diese Topologie samt ihrer Vor- und Nachteile ist vermutlich dem Großteil der Bevölkerung bekannt, da sowohl das Mobilfunknetz als auch WLANs auf diese Weise aufgebaut sind. Mehrere Basisstationen senden radial Funkwellen aus und überlappen sich gegenseitig, um die Vernetzung herzustellen. Dabei ist die Reichweite jeder Basisstation begrenzt. Der Vorteil liegt darin, dass keine Leitungen nötig sind und auch hier durch das Überlappen mehrerer Zellen Redundanzen geschaffen werden können.
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}
+\Vertex[y=2, x=0, size=2.2, RGB, color={127,201,90}]{B2}
+\Vertex[y=2, x=2, size=2.2, RGB, color={127,201,90}]{D2}
+\Vertex[y=0, x=0, size=2.2, RGB, color={127,201,90}]{A2}
+\Vertex[y=0, x=2, size=2.2, RGB, color={127,201,90}]{C}
+\Vertex[y=2, x=0]{B}
+\Vertex[y=2, x=2]{D}
+\Vertex[y=0, x=0]{A}
+\Vertex[y=0, x=2]{C}
+\end{tikzpicture}
+\caption{Zellnetz-Topologie}
+\end{figure}
+Während früher häufig Bus- und Ringnetze zum Einsatz kamen, werden heute häufig Maschennetze für Funknetze und Routerverbindungen genutzt, für Ethernet finden Stern- und Baumnetze Einsatz. Je nach Anwendungsfall und Rahmenbedingungen bieten sich andere Topologien an. Die {\glqq}ideale{\grqq} Topologie für alle Einsatzzwecke gibt es folglich nicht.
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|p{7cm}|}
+\hline
+PAN & Personal Area Network & Bis zu 100 Meter Ausdehnung (z.B. Bluetooth) \\
+\hline
+LAN & Local Area Network & Bis zu 10 Kilometer Ausdehnung (z.B. Verkabelung innerhalb von Gebäuden)  \\
+\hline
+MAN & Metropolitan Area Network & Bis zu 50 Kilometer Ausdehnung (z.B. städtisches Netz) \\
+\hline
+WAN & Wide Area Network & Ausdehnung über 10 Kilometer (z.B. Campus-Netze großer Firmen) \\
+\hline
+GAN & Global Area Network & Interkontinentale Netzwerke (z.B. Internet) \\
+\hline
+\end{tabular}
+\caption{Typische Ausdehnungen von Netzwerken}
+\end{table}
+\subsection{Aufgaben}
+\paragraph{Aufgabe 1} Entscheiden und begründen Sie, welche Kommunikationsmodi in folgenden Szenarien verwendet werden.
+\begin{itemize}
+\item Menschliche Kommunikation im Zwiegespräch
+\item Spannungsübertragung zwischen Plus- und Minuspol einer Batterie
+\item Kommunikation über Funkgeräte (Walkie-Talkies)
+\end{itemize}
+\paragraph{Aufgabe 2} Erläutern Sie die Begriffe Redundanz und Ausfallsicherheit anhand der dargestellten Netztopologien.
+\paragraph{Aufgabe 3} Entscheiden und begründen Sie, inwiefern sich Baumnetze auch aus anderen Netztopologien als vermaschten Netzen zusammensetzen ließen. Gehen Sie auf mögliche Vor- und Nachteile ein. 
+\section{Geschichte des Internets}
+Nun betrachten wir kurz die Geschichte des Internets anhand einer Zeittafel.
+\begin{table}[h]
+\centering
+\begin{tabular}{cp{13cm}}
+1967 & Die Advanced Research Projects Agency plant das ARPAnet, danach rein universitäre Ziele. \\
+1969 & Der erste ARPAnet-Knoten geht in Betrieb \\
+1972 & Das ARPAnet wird vorgestellt, mitsamt des NCP (Network Control Protocol) als erstes Protokoll zwischen Hosts \\
+1979 & Das ARPAnet wächst weiter und hat nun 200 Knoten. Parallel dazu entstehen proprietäre Architekturen wie DECnet, SNA und XNA \\
+1981 & TCP/IP wird eingeführt \\
+1982 & Das SMTP-Protokoll für E-Mails wird definiert \\
+1983 & Das DNS zur Übersetzung von Namen zu IP-Adressen wird definiert \\
+1990 & Das ARPAnet wird eingestellt, Hypertext (damit HTML, HTTP) wird entwickelt \\
+2007 & Das Internet verzeichnet 1.4 Millionen Nutzer und Anwendungen wie VoIP entstehen \\
+2019 & Nun nutzen $>$ 4 Millionen Menschen das Internet und das Anwendungsspektrum hat sich signifikant erweitert.
+\end{tabular}
+\caption{Geschichte des Internets}
+\end{table}
+\section{Standardisierung}
+Was wäre das Internet, wenn jeder Server und jeder Client eine eigene, andere Sprache spräche? Interkulturelle Differenzen und Missverständnisse bezögen sich nicht mehr ausschließlich auf den Inhalt unserer Datenpakete, sondern wir wären gar nicht mehr in der Lage, jene zu erkennen, da die Datenpakete mit relativ hoher Wahrscheinlichkeit gar nicht korrekt übermittelt und empfangen werden würden. Deshalb wurde das Internet hochgradig standardisiert. Im Folgenden werden kurz vier relevante Organisationen vorgestellt, die an der Normung und Definition von Standards im Internet mitwirken.
+\paragraph{International Organization for Standardization (ISO)} ist eine Agentur der vereinten Nationen, die in einer Vielzahl verschiedenster Bereiche Normen und Standards festlegt, so zum Beispiel auch im Bereich der IT-Sicherheit oder bei Spannungsschutzvorrichtungen bei elektronischen Geräten. In Bezug auf Telekommunikationssysteme sollte vorrangig das \textbf{ISO/OSI-Modell} genannt werden, dass als Referenzmodell verschiedene Schichten unterscheidet, in die sich die Kommunikation einteilen lässt. Dieses Modell betrachten wir später genauer.
+\paragraph{International Telecommunications Union (ITU)} ist ebenfalls ein UN-Organ, das weltweit die Koordination der Telekommunikation übernimmt. Zur ITU gehören die Definitionen von ATM, ISDN, V.24 und Carrier Ethernet.
+\paragraph{Institute of Electrical and Electronics Engineering (IEEE)} ist eines der wichtigsten Standardisierungsgremien für das Internet. Vermutlich haben Sie in Ihrem Studium auch bereits mindestens ein IEEE-Paper gelesen. Die IEEE standardisiert insbesondere auch WLAN, dort beispielsweise im Standard IEEE 802.11n.
+\paragraph{Internet Enginnerung Task Force (IETF)} definiert Internet-Standards, insbesondere Protokolle, in sogennanten RFC (Request for Comments). Hier sind Protokolle wie TCP, HTTP, FTP, Telnet, SSH oder VXLAN definiert und standardisiert. \\\\
+Eine klare Trennung und Zuordnung wäre sicher wünschenswert, gelingt aber nur mit mittlerem Erfolg. Verinfacht kann festgehalten werden, dass die ISO auf abstrakter Ebene Normen festlegt, die ITU sich hauptsächlich auf Telefonie und Telekommunikation beschränkt, die IEEE hardwarenahere Standards wie WLAN definiert und die IETF Dienste und Protokolle beschreibt. 
+\section{Schichtenmodelle}
+Wir wollen die Betrachtung von Netzwerken und Kommunikationsvorgängen nun dadurch vereinfachen und strukturieren, dass wir verschiedene Schichten unterscheiden, denen mehrere spezifizierte Aufgaben und Protokolle zugeordnet sind. Diese Strukturierung erleichtert einerseits unsere Kommunikation über die Prozesse, sorgt jedoch auch dafür, dass die Sicherheit und Wartbarkeit des Netzes ingesamt erhöht wird, da die Daten der einzelnen Schichten gekapselt werden. Beginnen wir mit dem ältesten und einfachsten Referenzmodell, dem TCP/IP-Modell.
+\subsection{TCP/IP-Referenzmodell}
+Dieses Modell entstammt dem Department of Defense der USA und wurde im Rahmen des ARPAnets entwickelt. Es werden vier Schichten unterschieden:
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}
+[node distance=11mm]
+\node (rect) (a) [draw,minimum width=3cm,minimum height=1cm] {Anwendung};
+\node (rect) (b) [draw,minimum width=3cm,minimum height=1cm, below of=a] {Transport};
+\node (rect) (c) [draw,minimum width=3cm,minimum height=1cm, below of=b] {Internet};
+\node (rect) (d) [draw,minimum width=3cm,minimum height=1cm, below of=c] {Netzzugang};
+\end{tikzpicture}
+\caption{TCP/IP-Referenzmodell}
+\end{figure}
+Ein Datenpaket wird in der Anwendungsschicht erzeugt und nun mittels eines Protokolls wie HTTP, FTP, SMTP, POP3 oder SMTP an die Transportschicht übertragen. Hier wird dem Paket ein zusätzlicher TCP- oder UDP-Header hinzugefügt, bevor es an die physische Infrastruktur weitergeleitet wird. Das Datenpaket wird nun zum IP-Paket und betritt die Netzwerkinfrastruktur zwischen Client und Server, wo es mittels Ethernet, WLAN oder weiteren Protokollen weiter übertragen wird. Erreicht es den Zielserver, werden die Schichten dort in umgekehrter Reihenfolge erneut durchlaufen, bis die Zielanwendung das Paket verarbeiten kann.
+\subsection{Hybrides Referenzmodell}
+Um noch genauer zu werden und detailliertere Aussagen zu treffen, erweitern wir das TCP/IP-Modell, indem die Netzzugangsschicht nun in zwei Schichten aufgeteilt wird.
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}
+[node distance=11mm]
+\node (rect) (a) [draw,minimum width=3cm,minimum height=1cm] {Anwendung};
+\node (rect) (b) [draw,minimum width=3cm,minimum height=1cm, below of=a] {Transport};
+\node (rect) (c) [draw,minimum width=3cm,minimum height=1cm, below of=b] {Internet};
+\node (rect) (d) [draw,minimum width=3cm,minimum height=1cm, below of=c] {Sicherung};
+\node (rect) (e) [draw,minimum width=3cm,minimum height=1cm, below of=d] {Bitübertragung};
+\end{tikzpicture}
+\caption{Hybrides Referenzmodell}
+\end{figure}
+Die Sicherungsschicht beschreibt nun den Datentransfer zwischen benachbarten Netzwerksystemen, zum Beispiel über Ethernet. Die Bitübertragungsschicht stellt nun ganz rudimentär nur die tatsächliche Übertragung einzelner Bits auf einer Leitung dar.
+\subsection{ISO/OSI-Referenzmodell}
+Um zum heute noch verbreiteten Standardmodell zu gelangen, fügen wir ebenfalls zwei weitere Schichten in das Modell hinzu.
+\begin{itemize}
+\item Die \textbf{Darstellungsschicht} ermöglicht es Anwendungen, die Daten zu interpretieren und zu modifizieren, also beispielsweise zu verschlüsseln oder zu komprimieren.
+\item Die \textbf{Kommunikationssteuerschicht} synchronisiert die Daten und setzt beispielsweise Wiederherstellungspunkte.
+\end{itemize}
+Diese Funktionalitäten müssen jeweils von den Anwendungen implementiert werden, da sie nicht zum eigentlichen Protokollstapel des Internets gehören.
+Wie erhalten das folgende Modell:
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}
+[node distance=11mm]
+\node (rect) (a) [draw,minimum width=5cm,minimum height=1cm] {Anwendung};
+\node (rect) (b) [draw,minimum width=5cm,minimum height=1cm, below of=a] {Darstellung};
+\node (rect) (c) [draw,minimum width=5cm,minimum height=1cm, below of=b] {Kommunikationsteuerung};
+\node (rect) (d) [draw,minimum width=5cm,minimum height=1cm, below of=c] {Transport};
+\node (rect) (e) [draw,minimum width=5cm,minimum height=1cm, below of=d] {Internet};
+\node (rect) (f) [draw,minimum width=5cm,minimum height=1cm, below of=e] {Sicherung};
+\node (rect) (g) [draw,minimum width=5cm,minimum height=1cm, below of=f] {Bitübertragung};
+\end{tikzpicture}
+\caption{ISO/OSI-Referenzmodell}
 \end{figure}
 \end{document}
